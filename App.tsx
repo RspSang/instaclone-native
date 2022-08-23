@@ -1,23 +1,30 @@
-import { StatusBar } from "expo-status-bar";
-import { useCallback, useEffect, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { useEffect, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { Asset } from "expo-asset";
 import * as Font from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
+import { NavigationContainer } from "@react-navigation/native";
+import LoggedOutNav from "./navigators/LoggedOutNav";
+import { Appearance, ColorSchemeName } from "react-native";
+import { darkTheme, lightTheme } from "./styles/styles";
+import { ThemeProvider } from "styled-components/native";
+import { ApolloProvider, useReactiveVar } from "@apollo/client";
+import client, { isDarkModeVar } from "./apollo";
 
 SplashScreen.preventAutoHideAsync();
 
 export default function App() {
+  const isDarkMode: "light" | "dark" = useReactiveVar(isDarkModeVar);
   const [appIsReady, setAppIsReady] = useState(false);
 
   useEffect(() => {
     async function prepare() {
       try {
         await Font.loadAsync(Ionicons.font);
-        await Asset.loadAsync(
-          require("./assets/logo.png")
-        );
+        await Asset.loadAsync(require("./assets/instagram_logo_dark.png"));
+        await Asset.loadAsync(require("./assets/instagram_logo_light.png"));
+        const colorSchemeName: ColorSchemeName = Appearance.getColorScheme();
+        isDarkModeVar(colorSchemeName === "light" ? "light" : "dark");
       } catch (e) {
         console.warn(e);
       } finally {
@@ -26,29 +33,20 @@ export default function App() {
     }
     prepare();
   }, []);
-  const onLayoutRootView = useCallback(async () => {
+
+  useEffect(() => {
     if (appIsReady) {
-      await SplashScreen.hideAsync();
+      SplashScreen.hideAsync();
     }
   }, [appIsReady]);
 
-  if (!appIsReady) {
-    return null;
-  }
-
   return (
-    <View style={styles.container} onLayout={onLayoutRootView}>
-      <Text>Open up App.tsx to start working on app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <ApolloProvider client={client}>
+      <ThemeProvider theme={isDarkMode === "light" ? lightTheme : darkTheme}>
+        <NavigationContainer>
+          <LoggedOutNav />
+        </NavigationContainer>
+      </ThemeProvider>
+    </ApolloProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});
