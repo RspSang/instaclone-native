@@ -9,7 +9,7 @@ export const lightTheme: DefaultTheme = {
   inactiveColor: "#B2DFFC",
   textBoldColor: "#979797",
   borderColor: "#DBDBDB",
-  inputBgColor: "#fafafa",
+  inputBgColor: "#dcdde1",
   searchBgColor: "#efefef",
   hashtagColor: "#00376b",
   grayTextColor: "#8F8F8F",
