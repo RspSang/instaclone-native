@@ -5,10 +5,11 @@ import {
   NormalizedCacheObject,
 } from "@apollo/client";
 
+export const isLoggedInVar = makeVar(false);
 export const isDarkModeVar = makeVar<"light" | "dark">("light");
 
 const client: ApolloClient<NormalizedCacheObject> = new ApolloClient({
-  uri: "http://localhost:4000/graphql",
+  uri: "https://fcd3-126-107-180-162.jp.ngrok.io/graphql",
   cache: new InMemoryCache(),
 });
 

@@ -1,4 +1,5 @@
 import React from "react";
+import { ActivityIndicator } from "react-native";
 import styled from "styled-components/native";
 
 const Button = styled.TouchableOpacity<{ disabled: boolean }>`
@@ -19,16 +20,22 @@ interface AuthButtonProps {
   onPress: () => void;
   text: string;
   disabled: boolean;
+  loading: boolean;
 }
 
 export default function AuthButton({
   onPress,
   disabled,
   text,
+  loading,
 }: AuthButtonProps) {
   return (
     <Button disabled={disabled} onPress={onPress}>
-      <ButtonText>{text}</ButtonText>
+      {loading ? (
+        <ActivityIndicator color="white" />
+      ) : (
+        <ButtonText>{text}</ButtonText>
+      )}
     </Button>
   );
 }
