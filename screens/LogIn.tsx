@@ -2,7 +2,7 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import React, { RefObject, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { TextInput } from "react-native";
-import { isLoggedInVar, logUserIn } from "../apollo";
+import { logUserIn } from "../apollo";
 import AuthButton from "../components/auth/AuthButton";
 import AuthLayout from "../components/auth/AuthLayout";
 import { AuthTextInput } from "../components/auth/AuthShared";
@@ -38,14 +38,14 @@ export default function LogIn({ route: { params } }: Props) {
       logInMutation({ variables: { username, password } });
     }
   };
-  const onCompleted = async({ login }: LoginMutation) => {
+  const onCompleted = async ({ login }: LoginMutation) => {
     if (login) {
       const { ok, error, token } = login;
       if (!ok && error) {
         setError("result", { message: error });
       }
       if (token) {
-        await logUserIn(token)
+        await logUserIn(token);
       }
     }
   };
