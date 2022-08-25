@@ -6,10 +6,11 @@ import * as SplashScreen from "expo-splash-screen";
 import { NavigationContainer } from "@react-navigation/native";
 import LoggedOutNav from "./navigators/LoggedOutNav";
 import { Appearance, ColorSchemeName } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { darkTheme, lightTheme } from "./styles/styles";
 import { ThemeProvider } from "styled-components/native";
 import { ApolloProvider, useReactiveVar } from "@apollo/client";
-import client, { isDarkModeVar, isLoggedInVar } from "./apollo";
+import client, { isDarkModeVar, isLoggedInVar, tokenVar } from "./apollo";
 import LoggedInNav from "./navigators/LoggedInNav";
 
 SplashScreen.preventAutoHideAsync();
@@ -27,6 +28,11 @@ export default function App() {
         await Asset.loadAsync(require("./assets/instagram_logo_light.png"));
         const colorSchemeName: ColorSchemeName = Appearance.getColorScheme();
         isDarkModeVar(colorSchemeName === "light" ? "light" : "dark");
+        const token = await AsyncStorage.getItem("token");
+        if (token) {
+          isLoggedInVar(true);
+          tokenVar(token);
+        }
       } catch (e) {
         console.warn(e);
       } finally {
