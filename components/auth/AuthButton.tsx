@@ -20,14 +20,14 @@ interface AuthButtonProps {
   onPress: () => void;
   text: string;
   disabled: boolean;
-  loading: boolean;
+  loading?: boolean;
 }
 
 export default function AuthButton({
   onPress,
   disabled,
   text,
-  loading,
+  loading = false,
 }: AuthButtonProps) {
   return (
     <Button disabled={disabled} onPress={onPress}>

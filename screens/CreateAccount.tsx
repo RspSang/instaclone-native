@@ -1,9 +1,16 @@
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RefObject, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { TextInput } from "react-native";
 import AuthButton from "../components/auth/AuthButton";
 import AuthLayout from "../components/auth/AuthLayout";
 import { AuthTextInput } from "../components/auth/AuthShared";
+import FormError from "../components/auth/FormError";
+import {
+  CreateAccountMutation,
+  useCreateAccountMutation,
+} from "../generated/graphql";
+import { RootStackParamList } from "../shared/shared.types";
 
 interface CreateAccountFormData {
   firstName: string;
@@ -11,13 +18,41 @@ interface CreateAccountFormData {
   username: string;
   email: string;
   password: string;
+  result?: string;
 }
 
-export default function CreateAccount() {
-  const { control, handleSubmit } = useForm<CreateAccountFormData>();
+type Props = NativeStackScreenProps<RootStackParamList, "CreateAccount">;
+
+export default function CreateAccount({ navigation }: Props) {
+  const {
+    control,
+    handleSubmit,
+    getValues,
+    setError,
+    formState: { errors, isValid },
+  } = useForm<CreateAccountFormData>({ mode: "onChange" });
   const onValid = (data: CreateAccountFormData) => {
-    console.log(data);
+    if (loading) return;
+    createAccount({ variables: { ...data } });
   };
+  const onCompleted = ({ createAccount }: CreateAccountMutation) => {
+    const { username, password } = getValues();
+    if (createAccount) {
+      const { ok, error } = createAccount;
+      if (!ok && error) {
+        setError("result", { message: error });
+        return;
+      }
+      navigation.navigate("LogIn", {
+        username,
+        password,
+      });
+    }
+  };
+  const [createAccount, { loading }] = useCreateAccountMutation({
+    onCompleted,
+  });
+
   const lastNameRef = useRef<TextInput | null>(null);
   const usernameRef = useRef<TextInput | null>(null);
   const emailRef = useRef<TextInput | null>(null);
@@ -109,9 +144,11 @@ export default function CreateAccount() {
           />
         )}
       />
+      {errors ? <FormError message={errors.result?.message} /> : null}
       <AuthButton
         text="Create Account"
-        disabled={false}
+        loading={loading}
+        disabled={!isValid || loading}
         onPress={handleSubmit(onValid)}
       />
     </AuthLayout>

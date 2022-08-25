@@ -1,11 +1,14 @@
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import React, { RefObject, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Text, TextInput, View } from "react-native";
+import { TextInput } from "react-native";
 import { isLoggedInVar } from "../apollo";
 import AuthButton from "../components/auth/AuthButton";
 import AuthLayout from "../components/auth/AuthLayout";
 import { AuthTextInput } from "../components/auth/AuthShared";
+import FormError from "../components/auth/FormError";
 import { LoginMutation, useLoginMutation } from "../generated/graphql";
+import { RootStackParamList } from "../shared/shared.types";
 
 interface LogInFormData {
   username: string;
@@ -13,15 +16,23 @@ interface LogInFormData {
   result: string;
 }
 
-export default function LogIn() {
+type Props = NativeStackScreenProps<RootStackParamList, "LogIn">;
+
+export default function LogIn({ route: { params } }: Props) {
   const {
     control,
     handleSubmit,
-    watch,
     setError,
     clearErrors,
-    formState: { errors },
-  } = useForm<LogInFormData>();
+    watch,
+    formState: { errors, isValid },
+  } = useForm<LogInFormData>({
+    mode: "onChange",
+    defaultValues: {
+      username: params?.username,
+      password: params?.password,
+    },
+  });
   const onValid = ({ username, password }: LogInFormData) => {
     if (!loading) {
       logInMutation({ variables: { username, password } });
@@ -63,7 +74,7 @@ export default function LogIn() {
             placeholderTextColor={"rgba(255, 255, 255, 0.6)"}
             onSubmitEditing={() => onNext(passwordRef)}
             onChangeText={onChange}
-            value={value}
+            value={watch("username")}
             onFocus={clearError}
           />
         )}
@@ -82,20 +93,16 @@ export default function LogIn() {
             placeholderTextColor={"rgba(255, 255, 255, 0.6)"}
             onSubmitEditing={handleSubmit(onValid)}
             onChangeText={onChange}
-            value={value}
+            value={watch("password")}
             onFocus={clearError}
           />
         )}
       />
-      {errors ? (
-        <View>
-          <Text style={{ color: "red" }}>{errors.result?.message}</Text>
-        </View>
-      ) : null}
+      {errors ? <FormError message={errors.result?.message} /> : null}
       <AuthButton
         text="Log In"
         loading={loading}
-        disabled={!watch("username") || !watch("password")}
+        disabled={!isValid || loading}
         onPress={handleSubmit(onValid)}
       />
     </AuthLayout>
