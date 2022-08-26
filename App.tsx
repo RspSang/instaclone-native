@@ -10,8 +10,14 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { darkTheme, lightTheme } from "./styles/styles";
 import { ThemeProvider } from "styled-components/native";
 import { ApolloProvider, useReactiveVar } from "@apollo/client";
-import client, { isDarkModeVar, isLoggedInVar, tokenVar } from "./apollo";
+import client, {
+  isDarkModeVar,
+  isLoggedInVar,
+  tokenVar,
+  cache,
+} from "./apollo";
 import LoggedInNav from "./navigators/LoggedInNav";
+import { AsyncStorageWrapper, persistCache } from "apollo3-cache-persist";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -23,6 +29,10 @@ export default function App() {
   useEffect(() => {
     async function prepare() {
       try {
+        await persistCache({
+          cache,
+          storage: new AsyncStorageWrapper(AsyncStorage),
+        });
         await Font.loadAsync(Ionicons.font);
         await Asset.loadAsync(require("./assets/instagram_logo_dark.png"));
         await Asset.loadAsync(require("./assets/instagram_logo_light.png"));

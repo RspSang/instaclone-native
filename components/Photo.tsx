@@ -6,6 +6,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { SharedStackNavParamList } from "../shared/shared.types";
 import { isDarkModeVar } from "../apollo";
 import { useReactiveVar } from "@apollo/client";
+import { useToggleLikeMutation } from "../generated/graphql";
 
 const Container = styled.View``;
 const Header = styled.TouchableOpacity`
@@ -71,6 +72,22 @@ export default function Photo({
   const { width, height } = useWindowDimensions();
   const navigation: NativeStackNavigationProp<SharedStackNavParamList, "Feed"> =
     useNavigation();
+
+  const [toggleLikeMutation] = useToggleLikeMutation({
+    variables: {
+      id: id ? id : 0,
+    },
+    update: (cache) => {
+      cache.modify({
+        id: `Photo:${id}`,
+        fields: {
+          isLiked: (prev) => !prev,
+          likes: (prev) => (isLiked ? prev - 1 : prev + 1),
+        },
+      });
+    },
+  });
+
   return (
     <Container>
       <Header onPress={() => navigation.navigate("Profile")}>
@@ -93,6 +110,7 @@ export default function Photo({
                 isLiked ? "tomato" : isDarkMode === "light" ? "black" : "white"
               }
               size={22}
+              onPress={() => toggleLikeMutation()}
             />
           </Action>
           <Action onPress={() => navigation.navigate("Comments")}>
