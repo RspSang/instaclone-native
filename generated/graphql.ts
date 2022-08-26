@@ -245,7 +245,7 @@ export type QuerySearchUsersArgs = {
 
 
 export type QuerySeeFeedArgs = {
-  page: Scalars['Int'];
+  offset: Scalars['Int'];
 };
 
 
@@ -377,7 +377,7 @@ export type LoginMutationVariables = Exact<{
 export type LoginMutation = { __typename?: 'Mutation', login?: { __typename?: 'LoginResult', ok: boolean, error?: string | null, token?: string | null } | null };
 
 export type SeeFeedQueryVariables = Exact<{
-  page: Scalars['Int'];
+  offset: Scalars['Int'];
 }>;
 
 
@@ -465,8 +465,8 @@ export type LoginMutationHookResult = ReturnType<typeof useLoginMutation>;
 export type LoginMutationResult = Apollo.MutationResult<LoginMutation>;
 export type LoginMutationOptions = Apollo.BaseMutationOptions<LoginMutation, LoginMutationVariables>;
 export const SeeFeedDocument = gql`
-    query seeFeed($page: Int!) {
-  seeFeed(page: $page) {
+    query seeFeed($offset: Int!) {
+  seeFeed(offset: $offset) {
     user {
       username
       avatar
@@ -505,7 +505,7 @@ export const SeeFeedDocument = gql`
  * @example
  * const { data, loading, error } = useSeeFeedQuery({
  *   variables: {
- *      page: // value for 'page'
+ *      offset: // value for 'offset'
  *   },
  * });
  */
