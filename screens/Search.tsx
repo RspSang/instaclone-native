@@ -1,8 +1,8 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { Text, TouchableOpacity, View } from "react-native";
-import { RootStackParamList } from "../shared/shared.types";
+import { SharedStackNavParamList } from "../shared/shared.types";
 
-type Props = NativeStackScreenProps<RootStackParamList, "Photo">;
+type Props = NativeStackScreenProps<SharedStackNavParamList, "Photo">;
 
 export default function Search({ navigation }: Props) {
   return (
