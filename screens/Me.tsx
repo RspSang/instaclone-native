@@ -1,9 +1,9 @@
 import { Text, View } from "react-native";
 
-export default function Profile() {
+export default function Me() {
   return (
     <View>
-      <Text>Someones Profile</Text>
+      <Text>Me</Text>
     </View>
   );
 }
