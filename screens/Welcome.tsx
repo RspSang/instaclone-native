@@ -12,9 +12,9 @@ const LoginLink = styled.Text`
   text-align: center;
 `;
 
-type Props = NativeStackScreenProps<RootStackParamList, "Enter">;
+type WelcomeProps = NativeStackScreenProps<RootStackParamList, "Enter">;
 
-export default function Welcome({ navigation }: Props) {
+export default function Welcome({ navigation }: WelcomeProps) {
   const goToCreateAccount = () => navigation.navigate("CreateAccount");
   const goToLogIn = () => navigation.navigate("LogIn");
   return (

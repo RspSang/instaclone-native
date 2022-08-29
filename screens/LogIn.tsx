@@ -16,9 +16,9 @@ interface LogInFormData {
   result: string;
 }
 
-type Props = NativeStackScreenProps<RootStackParamList, "LogIn">;
+type LoginProps = NativeStackScreenProps<RootStackParamList, "LogIn">;
 
-export default function LogIn({ route: { params } }: Props) {
+export default function LogIn({ route: { params } }: LoginProps) {
   const {
     control,
     handleSubmit,

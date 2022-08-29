@@ -21,9 +21,9 @@ interface CreateAccountFormData {
   result?: string;
 }
 
-type Props = NativeStackScreenProps<RootStackParamList, "CreateAccount">;
+type CreateAccountProps = NativeStackScreenProps<RootStackParamList, "CreateAccount">;
 
-export default function CreateAccount({ navigation }: Props) {
+export default function CreateAccount({ navigation }: CreateAccountProps) {
   const {
     control,
     handleSubmit,
