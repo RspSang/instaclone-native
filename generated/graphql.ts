@@ -388,7 +388,14 @@ export type SeeFeedQueryVariables = Exact<{
 }>;
 
 
-export type SeeFeedQuery = { __typename?: 'Query', seeFeed?: Array<{ __typename?: 'Photo', caption?: string | null, createdAt: string, isMine: boolean, id: number, file: string, likes: number, commentNumber: number, isLiked: boolean, user?: { __typename?: 'User', username: string, avatar?: string | null } | null, comments?: Array<{ __typename?: 'Comment', id: number, payload: string, isMine: boolean, createdAt: string, user: { __typename?: 'User', username: string, avatar?: string | null } } | null> | null } | null> | null };
+export type SeeFeedQuery = { __typename?: 'Query', seeFeed?: Array<{ __typename?: 'Photo', caption?: string | null, createdAt: string, isMine: boolean, id: number, file: string, likes: number, commentNumber: number, isLiked: boolean, user?: { __typename?: 'User', id: number, username: string, avatar?: string | null } | null, comments?: Array<{ __typename?: 'Comment', id: number, payload: string, isMine: boolean, createdAt: string, user: { __typename?: 'User', username: string, avatar?: string | null } } | null> | null } | null> | null };
+
+export type SeePhotoLikesQueryVariables = Exact<{
+  id: Scalars['Int'];
+}>;
+
+
+export type SeePhotoLikesQuery = { __typename?: 'Query', seePhotoLikes?: Array<{ __typename?: 'User', id: number, username: string, avatar?: string | null, isFollowing: boolean, isMe: boolean } | null> | null };
 
 
 export const CreateAccountDocument = gql`
@@ -509,6 +516,7 @@ export const SeeFeedDocument = gql`
     query seeFeed($offset: Int!) {
   seeFeed(offset: $offset) {
     user {
+      id
       username
       avatar
     }
@@ -561,3 +569,42 @@ export function useSeeFeedLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<Se
 export type SeeFeedQueryHookResult = ReturnType<typeof useSeeFeedQuery>;
 export type SeeFeedLazyQueryHookResult = ReturnType<typeof useSeeFeedLazyQuery>;
 export type SeeFeedQueryResult = Apollo.QueryResult<SeeFeedQuery, SeeFeedQueryVariables>;
+export const SeePhotoLikesDocument = gql`
+    query seePhotoLikes($id: Int!) {
+  seePhotoLikes(id: $id) {
+    id
+    username
+    avatar
+    isFollowing
+    isMe
+  }
+}
+    `;
+
+/**
+ * __useSeePhotoLikesQuery__
+ *
+ * To run a query within a React component, call `useSeePhotoLikesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useSeePhotoLikesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useSeePhotoLikesQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useSeePhotoLikesQuery(baseOptions: Apollo.QueryHookOptions<SeePhotoLikesQuery, SeePhotoLikesQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<SeePhotoLikesQuery, SeePhotoLikesQueryVariables>(SeePhotoLikesDocument, options);
+      }
+export function useSeePhotoLikesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<SeePhotoLikesQuery, SeePhotoLikesQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<SeePhotoLikesQuery, SeePhotoLikesQueryVariables>(SeePhotoLikesDocument, options);
+        }
+export type SeePhotoLikesQueryHookResult = ReturnType<typeof useSeePhotoLikesQuery>;
+export type SeePhotoLikesLazyQueryHookResult = ReturnType<typeof useSeePhotoLikesLazyQuery>;
+export type SeePhotoLikesQueryResult = Apollo.QueryResult<SeePhotoLikesQuery, SeePhotoLikesQueryVariables>;

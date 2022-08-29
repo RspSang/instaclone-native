@@ -50,7 +50,7 @@ const ExtraContainer = styled.View`
 
 interface PhotoProps {
   id?: number;
-  user?: { username: string; avatar?: string | null } | null;
+  user?: { id: number; username: string; avatar?: string | null } | null;
   file?: string;
   caption?: string | null;
   likes?: number;
@@ -70,12 +70,12 @@ export default function Photo({
 }: PhotoProps) {
   const isDarkMode: "light" | "dark" = useReactiveVar(isDarkModeVar);
   const { width, height } = useWindowDimensions();
-  const navigation: NativeStackNavigationProp<SharedStackNavParamList, "Feed"> =
+  const navigation: NativeStackNavigationProp<SharedStackNavParamList> =
     useNavigation();
 
   const [toggleLikeMutation] = useToggleLikeMutation({
     variables: {
-      id: id ? id : 0,
+      id: id!
     },
     update: (cache) => {
       cache.modify({
@@ -87,10 +87,15 @@ export default function Photo({
       });
     },
   });
-
+  const goToProfile = () => {
+    navigation.navigate("Profile", {
+      username: user?.username!,
+      id: user?.id!,
+    });
+  };
   return (
     <Container>
-      <Header onPress={() => navigation.navigate("Profile")}>
+      <Header onPress={goToProfile}>
         <UserAvatar resizeMode="cover" source={{ uri: user?.avatar }} />
         <Username>{user?.username}</Username>
       </Header>
@@ -121,11 +126,15 @@ export default function Photo({
             />
           </Action>
         </Actions>
-        <TouchableOpacity onPress={() => navigation.navigate("Likes")}>
+        <TouchableOpacity
+          onPress={() => {
+            navigation.navigate("Likes", { photoId: id! });
+          }}
+        >
           <Likes>{likes === 1 ? "1 like" : `${likes} likes`}</Likes>
         </TouchableOpacity>
         <Caption>
-          <TouchableOpacity onPress={() => navigation.navigate("Profile")}>
+          <TouchableOpacity onPress={goToProfile}>
             <Username>{user?.username}</Username>
           </TouchableOpacity>
           <CaptionText>{caption}</CaptionText>
