@@ -1,15 +1,37 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { Text, TouchableOpacity, View } from "react-native";
-import {  SharedStackNavParamList } from "../shared/shared.types";
+import { useState } from "react";
+import { RefreshControl } from "react-native";
+import styled from "styled-components/native";
+import Photo from "../components/Photo";
+import ScreenLayout from "../components/ScreenLayout";
+import { useSeePhotoQuery } from "../generated/graphql";
+import { SharedStackNavParamList } from "../shared/shared.types";
 
-type PhotoProps = NativeStackScreenProps<SharedStackNavParamList, "Profile">;
+const ScrollView = styled.ScrollView`
+  background-color: ${(props) => props.theme.bgColor};
+`;
 
-export default function Photo({ navigation }: PhotoProps) {
+type PhotoProps = NativeStackScreenProps<SharedStackNavParamList, "Photo">;
+
+export default function PhotoScreen({ route: { params } }: PhotoProps) {
+  const { data, loading, refetch } = useSeePhotoQuery({
+    variables: { id: params.photoId },
+  });
+  const [refreshing, setRefreshing] = useState(false);
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await refetch();
+    setRefreshing(false);
+  };
   return (
-    <View>
-      <TouchableOpacity onPress={() => navigation.navigate("Profile")}>
-        <Text>Profile</Text>
-      </TouchableOpacity>
-    </View>
+    <ScreenLayout loading={loading}>
+      <ScrollView
+        refreshControl={
+          <RefreshControl onRefresh={onRefresh} refreshing={refreshing} />
+        }
+      >
+        <Photo {...data?.seePhoto} />
+      </ScrollView>
+    </ScreenLayout>
   );
 }

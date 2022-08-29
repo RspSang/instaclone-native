@@ -10,7 +10,7 @@ export type SharedStackNavParamList = {
   Notifications: undefined;
   Me: undefined;
   Profile: { username: string; id: number };
-  Photo: undefined;
+  Photo: { photoId: number };
   Likes: { photoId: number };
   Comments: undefined;
 };

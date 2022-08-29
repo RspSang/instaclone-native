@@ -2,13 +2,15 @@ import { useReactiveVar } from "@apollo/client";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { isDarkModeVar } from "../apollo";
 import TabIcon from "../components/nav/TabIcon";
-import { View } from "react-native";
+import { Image, View } from "react-native";
 import SharedStackNav from "./SharedStackNav";
+import useMe from "../hooks/useMe";
 
 const Tabs = createBottomTabNavigator();
 
 export default function LoggedInNav() {
   const isDarkMode: "light" | "dark" = useReactiveVar(isDarkModeVar);
+  const { data } = useMe();
   return (
     <Tabs.Navigator
       screenOptions={{
@@ -63,9 +65,22 @@ export default function LoggedInNav() {
       <Tabs.Screen
         name="TabMe"
         options={{
-          tabBarIcon: ({ focused, color }) => (
-            <TabIcon iconName={"person"} color={color} focused={focused} />
-          ),
+          tabBarIcon: ({ focused, color }) =>
+            data?.me?.avatar ? (
+              <Image
+                source={{ uri: data.me.avatar }}
+                style={{
+                  height: 20,
+                  width: 20,
+                  borderRadius: 10,
+                  ...(focused && isDarkMode === "dark"
+                    ? { borderColor: "white", borderWidth: 1 }
+                    : { borderColor: "black", borderWidth: 1 }),
+                }}
+              />
+            ) : (
+              <TabIcon iconName={"person"} color={color} focused={focused} />
+            ),
         }}
       >
         {() => <SharedStackNav screenName="Me" />}
