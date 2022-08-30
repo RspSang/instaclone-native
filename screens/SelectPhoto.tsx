@@ -51,13 +51,13 @@ export default function SelectPhoto({ navigation }: SelectPhotoProps) {
     setChosenPhoto(photos[0]?.uri);
   };
   const getPermissions = async () => {
-    const { status } = await MediaLibrary.getPermissionsAsync();
-    if (status !== "granted") {
-      const { accessPrivileges } = await MediaLibrary.requestPermissionsAsync();
-      if (accessPrivileges !== "none") {
+    const { status, canAskAgain } = await MediaLibrary.getPermissionsAsync();
+    if (status === "undetermined" && canAskAgain) {
+      const { status } = await MediaLibrary.requestPermissionsAsync();
+      if (status === "undetermined") {
         getPhotos();
       }
-    } else if (status === "granted") {
+    } else if (status !== "undetermined") {
       getPhotos();
     }
   };
