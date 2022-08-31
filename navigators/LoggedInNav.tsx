@@ -2,6 +2,7 @@ import { useReactiveVar } from "@apollo/client";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { isDarkModeVar } from "../apollo";
 import UploadForm from "../screens/UploadForm";
+import MessagesNav from "./MessagesNav";
 import TabsNav from "./TabsNav";
 import UploadNav from "./UploadNav";
 
@@ -32,6 +33,11 @@ export default function LoggedInNav() {
           },
         }}
         component={UploadForm}
+      />
+      <Stack.Screen
+        name="Messages"
+        options={{ headerShown: false }}
+        component={MessagesNav}
       />
     </Stack.Navigator>
   );
