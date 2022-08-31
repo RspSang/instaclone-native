@@ -17,4 +17,5 @@ export type SharedStackNavParamList = {
   SelectPhoto: undefined;
   TakePhoto: undefined;
   Tabs: undefined;
+  UploadForm: { file: string };
 };

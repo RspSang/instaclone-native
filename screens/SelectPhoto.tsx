@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { SharedStackNavParamList } from "../shared/shared.types";
+import { StatusBar } from "expo-status-bar";
 
 const Container = styled.View`
   flex: 1;
@@ -37,19 +38,28 @@ const HeaderRightText = styled.Text`
   margin-right: 7px;
 `;
 
-type SelectPhotoProps = NativeStackScreenProps<
-  SharedStackNavParamList,
-  "SelectPhoto"
->;
+type SelectPhotoProps = NativeStackScreenProps<SharedStackNavParamList>;
 
 export default function SelectPhoto({ navigation }: SelectPhotoProps) {
   const [photos, setPhotos] = useState<MediaLibrary.Asset[]>([]);
   const [chosenPhoto, setChosenPhoto] = useState("");
+  const [photoLocal, setPhotoLocal] = useState("");
+  const numColumns = 4;
+  const { width } = useWindowDimensions();
+
+  const choosePhoto = async (id: string) => {
+    const assetInfo = await MediaLibrary.getAssetInfoAsync(id);
+    setPhotoLocal(assetInfo.localUri!);
+    setChosenPhoto(assetInfo.uri);
+  };
+
   const getPhotos = async () => {
     const { assets: photos } = await MediaLibrary.getAssetsAsync();
     setPhotos(photos);
     setChosenPhoto(photos[0]?.uri);
+    choosePhoto(photos[0]?.id);
   };
+
   const getPermissions = async () => {
     const { status, canAskAgain } = await MediaLibrary.getPermissionsAsync();
     if (status === "undetermined" && canAskAgain) {
@@ -61,26 +71,26 @@ export default function SelectPhoto({ navigation }: SelectPhotoProps) {
       getPhotos();
     }
   };
-  const HeaderRight = () => (
-    <TouchableOpacity>
+
+  const headerRight = () => (
+    <TouchableOpacity
+      onPress={() => navigation.navigate("UploadForm", { file: photoLocal })}
+    >
       <HeaderRightText>Next</HeaderRightText>
     </TouchableOpacity>
   );
+  
   useEffect(() => {
     getPermissions();
   }, []);
   useEffect(() => {
     navigation.setOptions({
-      headerRight: HeaderRight,
+      headerRight,
     });
-  }, []);
-  const numColumns = 4;
-  const { width } = useWindowDimensions();
-  const choosePhoto = (uri: string) => {
-    setChosenPhoto(uri);
-  };
+  }, [chosenPhoto, photoLocal]);
+
   const renderItem = ({ item: photo }: any) => (
-    <ImageContainer onPress={() => choosePhoto(photo.uri)}>
+    <ImageContainer onPress={() => choosePhoto(photo.id)}>
       <Image
         source={{ uri: photo.uri }}
         style={{ width: width / numColumns, height: 100 }}
@@ -96,6 +106,7 @@ export default function SelectPhoto({ navigation }: SelectPhotoProps) {
   );
   return (
     <Container>
+      <StatusBar hidden={false} />
       <Top>
         {chosenPhoto !== "" ? (
           <Image
