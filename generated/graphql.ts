@@ -437,7 +437,7 @@ export type SeeRoomQueryVariables = Exact<{
 }>;
 
 
-export type SeeRoomQuery = { __typename?: 'Query', seeRoom?: { __typename?: 'Room', messages?: Array<{ __typename?: 'Message', id: number, payload: string, read: boolean, user: { __typename?: 'User', username: string, avatar?: string | null } } | null> | null } | null };
+export type SeeRoomQuery = { __typename?: 'Query', seeRoom?: { __typename?: 'Room', id: number, messages?: Array<{ __typename?: 'Message', id: number, payload: string, read: boolean, user: { __typename?: 'User', username: string, avatar?: string | null } } | null> | null } | null };
 
 export type SeeRoomsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -857,6 +857,7 @@ export type SeePhotoLikesQueryResult = Apollo.QueryResult<SeePhotoLikesQuery, Se
 export const SeeRoomDocument = gql`
     query seeRoom($id: Int!) {
   seeRoom(id: $id) {
+    id
     messages {
       id
       payload
