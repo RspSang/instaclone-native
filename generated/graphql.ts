@@ -375,6 +375,15 @@ export type LoginMutationVariables = Exact<{
 
 export type LoginMutation = { __typename?: 'Mutation', login?: { __typename?: 'LoginResult', ok: boolean, error?: string | null, token?: string | null } | null };
 
+export type SendMessageMutationVariables = Exact<{
+  payload: Scalars['String'];
+  roomId?: InputMaybe<Scalars['Int']>;
+  userId?: InputMaybe<Scalars['Int']>;
+}>;
+
+
+export type SendMessageMutation = { __typename?: 'Mutation', sendMessage: { __typename?: 'MutationResponse', ok: boolean, id?: number | null } };
+
 export type ToggleLikeMutationVariables = Exact<{
   id: Scalars['Int'];
 }>;
@@ -422,6 +431,13 @@ export type SeePhotoLikesQueryVariables = Exact<{
 
 
 export type SeePhotoLikesQuery = { __typename?: 'Query', seePhotoLikes?: Array<{ __typename?: 'User', id: number, username: string, avatar?: string | null, isFollowing: boolean, isMe: boolean } | null> | null };
+
+export type SeeRoomQueryVariables = Exact<{
+  id: Scalars['Int'];
+}>;
+
+
+export type SeeRoomQuery = { __typename?: 'Query', seeRoom?: { __typename?: 'Room', messages?: Array<{ __typename?: 'Message', id: number, payload: string, read: boolean, user: { __typename?: 'User', username: string, avatar?: string | null } } | null> | null } | null };
 
 export type SeeRoomsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -509,6 +525,42 @@ export function useLoginMutation(baseOptions?: Apollo.MutationHookOptions<LoginM
 export type LoginMutationHookResult = ReturnType<typeof useLoginMutation>;
 export type LoginMutationResult = Apollo.MutationResult<LoginMutation>;
 export type LoginMutationOptions = Apollo.BaseMutationOptions<LoginMutation, LoginMutationVariables>;
+export const SendMessageDocument = gql`
+    mutation sendMessage($payload: String!, $roomId: Int, $userId: Int) {
+  sendMessage(payload: $payload, roomId: $roomId, userId: $userId) {
+    ok
+    id
+  }
+}
+    `;
+export type SendMessageMutationFn = Apollo.MutationFunction<SendMessageMutation, SendMessageMutationVariables>;
+
+/**
+ * __useSendMessageMutation__
+ *
+ * To run a mutation, you first call `useSendMessageMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSendMessageMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [sendMessageMutation, { data, loading, error }] = useSendMessageMutation({
+ *   variables: {
+ *      payload: // value for 'payload'
+ *      roomId: // value for 'roomId'
+ *      userId: // value for 'userId'
+ *   },
+ * });
+ */
+export function useSendMessageMutation(baseOptions?: Apollo.MutationHookOptions<SendMessageMutation, SendMessageMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<SendMessageMutation, SendMessageMutationVariables>(SendMessageDocument, options);
+      }
+export type SendMessageMutationHookResult = ReturnType<typeof useSendMessageMutation>;
+export type SendMessageMutationResult = Apollo.MutationResult<SendMessageMutation>;
+export type SendMessageMutationOptions = Apollo.BaseMutationOptions<SendMessageMutation, SendMessageMutationVariables>;
 export const ToggleLikeDocument = gql`
     mutation toggleLike($id: Int!) {
   toggleLike(id: $id) {
@@ -802,6 +854,49 @@ export function useSeePhotoLikesLazyQuery(baseOptions?: Apollo.LazyQueryHookOpti
 export type SeePhotoLikesQueryHookResult = ReturnType<typeof useSeePhotoLikesQuery>;
 export type SeePhotoLikesLazyQueryHookResult = ReturnType<typeof useSeePhotoLikesLazyQuery>;
 export type SeePhotoLikesQueryResult = Apollo.QueryResult<SeePhotoLikesQuery, SeePhotoLikesQueryVariables>;
+export const SeeRoomDocument = gql`
+    query seeRoom($id: Int!) {
+  seeRoom(id: $id) {
+    messages {
+      id
+      payload
+      user {
+        username
+        avatar
+      }
+      read
+    }
+  }
+}
+    `;
+
+/**
+ * __useSeeRoomQuery__
+ *
+ * To run a query within a React component, call `useSeeRoomQuery` and pass it any options that fit your needs.
+ * When your component renders, `useSeeRoomQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useSeeRoomQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useSeeRoomQuery(baseOptions: Apollo.QueryHookOptions<SeeRoomQuery, SeeRoomQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<SeeRoomQuery, SeeRoomQueryVariables>(SeeRoomDocument, options);
+      }
+export function useSeeRoomLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<SeeRoomQuery, SeeRoomQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<SeeRoomQuery, SeeRoomQueryVariables>(SeeRoomDocument, options);
+        }
+export type SeeRoomQueryHookResult = ReturnType<typeof useSeeRoomQuery>;
+export type SeeRoomLazyQueryHookResult = ReturnType<typeof useSeeRoomLazyQuery>;
+export type SeeRoomQueryResult = Apollo.QueryResult<SeeRoomQuery, SeeRoomQueryVariables>;
 export const SeeRoomsDocument = gql`
     query seeRooms {
   seeRooms {

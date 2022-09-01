@@ -19,4 +19,16 @@ export type SharedStackNavParamList = {
   Tabs: undefined;
   UploadForm: { file: string };
   Messages: undefined;
+  Room: {
+    id: number;
+    talkingTo:
+      | {
+          __typename?: "User" | undefined;
+          username: string;
+          avatar?: string | null | undefined;
+        }
+      | null
+      | undefined;
+  };
+  [key: string]: any;
 };

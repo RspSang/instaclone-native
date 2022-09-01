@@ -28,7 +28,7 @@ export const darkTheme: DefaultTheme = {
   inactiveColor: "#B2DFFC",
   textBoldColor: "#979797",
   borderColor: "rgb(60,60,60)",
-  inputBgColor: "black",
+  inputBgColor: "#353b48",
   searchBgColor: "black",
   hashtagColor: "#00376b",
   grayTextColor: "#8F8F8F",

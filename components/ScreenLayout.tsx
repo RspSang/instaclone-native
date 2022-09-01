@@ -4,7 +4,7 @@ import { isDarkModeVar } from "../apollo";
 
 interface ScreenLayoutProps {
   loading: boolean;
-  children: JSX.Element;
+  children: React.ReactNode;
 }
 
 export default function ScreenLayout({ loading, children }: ScreenLayoutProps) {
