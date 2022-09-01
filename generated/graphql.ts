@@ -444,6 +444,13 @@ export type SeeRoomsQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type SeeRoomsQuery = { __typename?: 'Query', seeRooms?: Array<{ __typename?: 'Room', id: number, unreadTotal: number, users?: Array<{ __typename?: 'User', avatar?: string | null, username: string } | null> | null } | null> | null };
 
+export type RoomUpdatesSubscriptionVariables = Exact<{
+  id: Scalars['Int'];
+}>;
+
+
+export type RoomUpdatesSubscription = { __typename?: 'Subscription', roomUpdates?: { __typename?: 'Message', id: number, payload: string, read: boolean, user: { __typename?: 'User', username: string, avatar?: string | null } } | null };
+
 
 export const CreateAccountDocument = gql`
     mutation CreateAccount($firstName: String!, $lastName: String, $username: String!, $email: String!, $password: String!) {
@@ -937,3 +944,39 @@ export function useSeeRoomsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<S
 export type SeeRoomsQueryHookResult = ReturnType<typeof useSeeRoomsQuery>;
 export type SeeRoomsLazyQueryHookResult = ReturnType<typeof useSeeRoomsLazyQuery>;
 export type SeeRoomsQueryResult = Apollo.QueryResult<SeeRoomsQuery, SeeRoomsQueryVariables>;
+export const RoomUpdatesDocument = gql`
+    subscription roomUpdates($id: Int!) {
+  roomUpdates(id: $id) {
+    id
+    payload
+    user {
+      username
+      avatar
+    }
+    read
+  }
+}
+    `;
+
+/**
+ * __useRoomUpdatesSubscription__
+ *
+ * To run a query within a React component, call `useRoomUpdatesSubscription` and pass it any options that fit your needs.
+ * When your component renders, `useRoomUpdatesSubscription` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the subscription, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useRoomUpdatesSubscription({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useRoomUpdatesSubscription(baseOptions: Apollo.SubscriptionHookOptions<RoomUpdatesSubscription, RoomUpdatesSubscriptionVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useSubscription<RoomUpdatesSubscription, RoomUpdatesSubscriptionVariables>(RoomUpdatesDocument, options);
+      }
+export type RoomUpdatesSubscriptionHookResult = ReturnType<typeof useRoomUpdatesSubscription>;
+export type RoomUpdatesSubscriptionResult = Apollo.SubscriptionResult<RoomUpdatesSubscription>;

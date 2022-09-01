@@ -1,11 +1,15 @@
-import { gql } from "@apollo/client";
+import { gql, Reference, useApolloClient } from "@apollo/client";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FlatList, KeyboardAvoidingView, View } from "react-native";
 import styled from "styled-components/native";
 import ScreenLayout from "../components/ScreenLayout";
-import { useSeeRoomQuery, useSendMessageMutation } from "../generated/graphql";
+import {
+  RoomUpdatesDocument,
+  useSeeRoomQuery,
+  useSendMessageMutation,
+} from "../generated/graphql";
 import useMe from "../hooks/useMe";
 import { SharedStackNavParamList } from "../shared/shared.types";
 import { Ionicons } from "@expo/vector-icons";
@@ -56,6 +60,8 @@ const InputContainer = styled.View`
 const SendButton = styled.TouchableOpacity``;
 
 export default function Room({ route: { params }, navigation }: RoomProps) {
+  const [subscribed, setSubscribed] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const { data: meData } = useMe();
   const { control, handleSubmit, getValues, setValue, watch } =
     useForm<MessageFormData>();
@@ -81,7 +87,7 @@ export default function Room({ route: { params }, navigation }: RoomProps) {
             read: true,
             __typename: "Message",
           };
-          const messageFragment = cache.writeFragment({
+          const incomingMessage = cache.writeFragment({
             fragment: gql`
               fragment NewMessage on Message {
                 id
@@ -99,7 +105,14 @@ export default function Room({ route: { params }, navigation }: RoomProps) {
             id: `Room:${params.id}`,
             fields: {
               messages(prev) {
-                return [...prev, messageFragment];
+                const existingMessage = prev.find(
+                  (aMessage: Reference) =>
+                    aMessage.__ref === incomingMessage?.__ref
+                );
+                if (existingMessage) {
+                  return prev;
+                }
+                return [...prev, incomingMessage];
               },
             },
           });
@@ -107,11 +120,17 @@ export default function Room({ route: { params }, navigation }: RoomProps) {
       },
     });
 
-  const { data, loading } = useSeeRoomQuery({
+  const { data, loading, refetch, subscribeToMore } = useSeeRoomQuery({
     variables: {
       id: params?.id,
     },
   });
+
+  const onRefresh = async (): Promise<void> => {
+    setRefreshing(true);
+    await refetch();
+    setRefreshing(false);
+  };
 
   const renderItem = ({ item: message }: any) => (
     <MessageContainer
@@ -132,6 +151,49 @@ export default function Room({ route: { params }, navigation }: RoomProps) {
     }
   };
 
+  const client = useApolloClient();
+
+  useEffect(() => {
+    if (data?.seeRoom && !subscribed) {
+      subscribeToMore({
+        document: RoomUpdatesDocument,
+        variables: { id: params.id },
+        updateQuery: (prevQuery, options: any): any => {
+          const {
+            subscriptionData: {
+              data: { roomUpdates: message },
+            },
+          } = options;
+          if (message.id) {
+            const incomingMessage = client.cache.writeFragment({
+              fragment: gql`
+                fragment NewMessage on Message {
+                  id
+                  payload
+                  user {
+                    username
+                    avatar
+                  }
+                  read
+                }
+              `,
+              data: message,
+            });
+            client.cache.modify({
+              id: `Room:${params.id}`,
+              fields: {
+                messages(prev) {
+                  return [...prev, incomingMessage];
+                },
+              },
+            });
+          }
+        },
+      });
+      setSubscribed(true);
+    }
+  }, [data, subscribed]);
+
   useEffect(() => {
     navigation.setOptions({
       title: `${params?.talkingTo?.username}`,
@@ -148,6 +210,8 @@ export default function Room({ route: { params }, navigation }: RoomProps) {
         <FlatList
           style={{ width: "100%", paddingVertical: 10 }}
           inverted
+          refreshing={refreshing}
+          onRefresh={onRefresh}
           ItemSeparatorComponent={() => <View style={{ height: 13 }}></View>}
           data={[...(data?.seeRoom?.messages || [])].reverse()}
           keyExtractor={(message) => "" + message?.id}
