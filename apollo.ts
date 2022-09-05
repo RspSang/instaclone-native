@@ -34,7 +34,7 @@ export const logUserOut = async () => {
 };
 
 const uploadHttpLink = createUploadLink({
-  uri: "https://2aef-126-107-180-162.jp.ngrok.io/graphql",
+  uri: "https://rspsang-instaclone.herokuapp.com/graphql",
 });
 
 const authLink = setContext((_, { headers }) => {
@@ -56,7 +56,7 @@ const onErrorLink = onError(({ graphQLErrors, networkError }) => {
 });
 
 const wsLink = new WebSocketLink({
-  uri: "ws://2aef-126-107-180-162.jp.ngrok.io/graphql",
+  uri: "ws://rspsang-instaclone.herokuapp.com/graphql",
   options: {
     reconnect: true,
     connectionParams: () => ({ token: tokenVar() }),
